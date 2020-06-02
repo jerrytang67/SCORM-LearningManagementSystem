@@ -22,7 +22,7 @@ namespace OpenSourceSCORMLMS.Helpers
             string connectionString = getConnectionString();
             var options = new DbContextOptionsBuilder<ApplicationDbContext>();
             options.UseSqlServer(connectionString);
-            ApplicationDbContext context = new Data.ApplicationDbContext(options.Options);
+            ApplicationDbContext context = new ApplicationDbContext(options.Options);
             return context;
         }
     }

@@ -9,16 +9,19 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Microsoft.Data.SqlClient;
 
 namespace OpenSourceSCORMLMS.Helpers
 {
     public class DatabaseHelper
     {
         private ILogger logger { get; set; }
+
         public DatabaseHelper(ILogger logger)
         {
             this.logger = logger;
         }
+
         public bool isCourseInUserStudyArea(int SCORM_Course_id, string UserID)
         {
             bool b = false;
@@ -37,8 +40,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return b;
         }
+
         public void AddCourseToUsersStudyArea(int SCORM_Course_id, string UserID)
         {
             try
@@ -76,6 +81,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void UpdateUserModuleDateCompleted(string UserID, int SCORM_Course_id, DateTime dtDateCompleted)
         {
             try
@@ -92,6 +98,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void UpdateUserModuleScore(string UserID, int SCORM_Course_id, decimal dScore)
         {
             try
@@ -108,6 +115,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void UpdateUserModulePassed(string UserID, int SCORM_Course_id, DateTime dtPassed)
         {
             try
@@ -125,6 +133,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void UpdateCore(int core_id, string entry, string lesson_status, string total_time)
         {
             try
@@ -143,6 +152,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void UpdateSession(int id, DateTime enddatetime)
         {
             try
@@ -159,6 +169,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void UpdateUserModuleCompleted(string UserID, int SCORM_Course_id, DateTime dtCompleted)
         {
             try
@@ -175,6 +186,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public List<User_Module> SelectUserModule(string UserID)
         {
             using (var context = ConnectionHelper.getContext())
@@ -186,6 +198,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 return rows;
             }
         }
+
         public void InsertCMIData(string user_id, string sco_id, int SCORM_courses_id, string launch_data, string max_time_allowed, decimal? mastery_score, string time_limit_action)
         {
             try
@@ -209,6 +222,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void InsertScormCourse(string titleFromManifest, string title, string pathToIndex, string pathToManifest, string pathToFolder, string SCORM_Version, DateTime dtUploaded, string UserID)
         {
             try
@@ -225,7 +239,6 @@ namespace OpenSourceSCORMLMS.Helpers
                     SCORM_course.SCORM_version = SCORM_Version;
                     context.SCORM_Course.Add(SCORM_course);
                     context.SaveChanges();
-
                 }
             }
             catch (Exception ex)
@@ -233,6 +246,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void SetValueCore(int core_id, string sDataItem, string sDataValue)
         {
             string s = $"UPDATE cmi_core set {sDataItem} = @sDataValue where core_id = @core_id";
@@ -240,15 +254,15 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 using (var context = ConnectionHelper.getContext())
                 {
-                  
                     DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                     cmd.CommandText = s;
-                    cmd.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) { Value = core_id });
-                    cmd.Parameters.Add(new SqlParameter("@sDataValue", SqlDbType.VarChar) { Value = sDataValue });
+                    cmd.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) {Value = core_id});
+                    cmd.Parameters.Add(new SqlParameter("@sDataValue", SqlDbType.VarChar) {Value = sDataValue});
                     if (cmd.Connection.State.Equals(ConnectionState.Closed))
                     {
                         cmd.Connection.Open();
                     }
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -257,6 +271,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void SetValueStudentPreference(int student_preference_id, string sDataItem, string sDataValue)
         {
             string s = $"UPDATE cmi_student_preference set {sDataItem} = @sDataValue where id = @student_preference_id";
@@ -266,12 +281,13 @@ namespace OpenSourceSCORMLMS.Helpers
                 {
                     DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                     cmd.CommandText = s;
-                    cmd.Parameters.Add(new SqlParameter("@student_preference_id", SqlDbType.Int) { Value = student_preference_id });
-                    cmd.Parameters.Add(new SqlParameter("@sDataValue", SqlDbType.VarChar) { Value = sDataValue });
+                    cmd.Parameters.Add(new SqlParameter("@student_preference_id", SqlDbType.Int) {Value = student_preference_id});
+                    cmd.Parameters.Add(new SqlParameter("@sDataValue", SqlDbType.VarChar) {Value = sDataValue});
                     if (cmd.Connection.State.Equals(ConnectionState.Closed))
                     {
                         cmd.Connection.Open();
                     }
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -280,6 +296,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void SetValueSuspendData(int data_id, string suspend_data)
         {
             string s = $"UPDATE cmi_data set suspend_data = @suspend_data where id = @data_id";
@@ -289,12 +306,13 @@ namespace OpenSourceSCORMLMS.Helpers
                 {
                     DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                     cmd.CommandText = s;
-                    cmd.Parameters.Add(new SqlParameter("@data_id", SqlDbType.Int) { Value = data_id });
-                    cmd.Parameters.Add(new SqlParameter("@suspend_data", SqlDbType.VarChar) { Value = suspend_data });
+                    cmd.Parameters.Add(new SqlParameter("@data_id", SqlDbType.Int) {Value = data_id});
+                    cmd.Parameters.Add(new SqlParameter("@suspend_data", SqlDbType.VarChar) {Value = suspend_data});
                     if (cmd.Connection.State.Equals(ConnectionState.Closed))
                     {
                         cmd.Connection.Open();
                     }
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -303,6 +321,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void SetValueObjectives(int id, string sDataItem, string sDataValue)
         {
             string s = $"UPDATE cmi_objectives set {sDataItem} = @sDataValue where id = @id";
@@ -312,12 +331,13 @@ namespace OpenSourceSCORMLMS.Helpers
                 {
                     DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                     cmd.CommandText = s;
-                    cmd.Parameters.Add(new SqlParameter("@id", SqlDbType.Int) { Value = id });
-                    cmd.Parameters.Add(new SqlParameter("@sDataValue", SqlDbType.VarChar) { Value = sDataValue });
+                    cmd.Parameters.Add(new SqlParameter("@id", SqlDbType.Int) {Value = id});
+                    cmd.Parameters.Add(new SqlParameter("@sDataValue", SqlDbType.VarChar) {Value = sDataValue});
                     if (cmd.Connection.State.Equals(ConnectionState.Closed))
                     {
                         cmd.Connection.Open();
                     }
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -326,12 +346,13 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public string GetVersion(int SCORM_Course_id)
         {
             string version = "1.2";
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "select SCORM_version from dbo.SCORM_Courses where id=@SCORM_Course_id";
-            cmd.Parameters.Add(new SqlParameter("@SCORM_Course_id", SqlDbType.VarChar) { Value = SCORM_Course_id });
+            cmd.Parameters.Add(new SqlParameter("@SCORM_Course_id", SqlDbType.VarChar) {Value = SCORM_Course_id});
             DataTable dt = GetDataTableCommand(cmd);
             if (dt.Rows.Count > 0)
             {
@@ -341,8 +362,10 @@ namespace OpenSourceSCORMLMS.Helpers
                     version = v;
                 }
             }
+
             return version;
         }
+
         public int GetCmiDataID(string user_id, string sco_identifier, string sco_courses_id)
         {
             int cmi_data_id = 0;
@@ -359,8 +382,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return cmi_data_id;
         }
+
         public cmi_core GetCMICoreById(int core_id)
         {
             cmi_core core = new cmi_core();
@@ -375,8 +400,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return core;
         }
+
         public cmi_data GetCMIDataByID(int data_id)
         {
             cmi_data data = new cmi_data();
@@ -391,9 +418,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
-            return data;
 
+            return data;
         }
+
         public int getCountInteractionsByCoreID(int core_id)
         {
             int iCount = 0;
@@ -408,8 +436,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return iCount;
         }
+
         public cmi_interactions GetInteractionsByInteractionsID(int interactions_id)
         {
             cmi_interactions interactions = new cmi_interactions();
@@ -424,8 +454,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return interactions;
         }
+
         public string GetInteractionType(int cmi_interactions_id)
         {
             string sType = "";
@@ -445,8 +477,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return sType;
         }
+
         public int getCountObjectivesByCoreID(int core_id)
         {
             int iCount = 0;
@@ -461,8 +495,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return iCount;
         }
+
         public int getCountCommentsFromLearnerByCoreID(int core_id)
         {
             int iCount = 0;
@@ -477,6 +513,7 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return iCount;
         }
 
@@ -494,9 +531,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
-            return iCount;
 
+            return iCount;
         }
+
         public int GetCountInteractionsObjectivesByInteractionsID(int interactions_id)
         {
             int iCount = 0;
@@ -511,9 +549,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
-            return iCount;
 
+            return iCount;
         }
+
         public int getCountCommentsFromLMS(int SCORM_Course_id, string SCO_identifier)
         {
             int iCount = 0;
@@ -528,8 +567,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return iCount;
         }
+
         public List<SCORMCourse> getCourseList()
         {
             List<SCORMCourse> listCourses = new List<SCORMCourse>();
@@ -537,7 +578,7 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 using (var context = ConnectionHelper.getContext())
                 {
-                    var list = context.SCORM_Course.Select(i => new { i.id, i.pathToIndex, i.pathToFolder, i.title_from_manifest, i.DateUploaded }).OrderBy(ix => ix.title_from_manifest).ToList();
+                    var list = context.SCORM_Course.Select(i => new {i.id, i.pathToIndex, i.pathToFolder, i.title_from_manifest, i.DateUploaded}).OrderBy(ix => ix.title_from_manifest).ToList();
                     foreach (var j in list)
                     {
                         var k = new SCORMCourse();
@@ -553,8 +594,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return listCourses;
         }
+
         public List<SCORM_Course_fromSP> getCourseListWithUserIndicator(string UserId)
         {
             //
@@ -567,16 +610,18 @@ namespace OpenSourceSCORMLMS.Helpers
                 using (var context = ConnectionHelper.getContext())
                 {
                     listCourses = context.SCORM_Course_FromSP
-                      .FromSql($"dbo.Sel_CoursesWithUserIndicator {UserId}")
-                      .ToList();
+                        .FromSqlRaw("EXECUTE dbo.Sel_CoursesWithUserIndicator {0}", UserId)
+                        .ToList();
                 }
             }
             catch (Exception ex)
             {
                 logger.LogError(ex.Message);
             }
+
             return listCourses;
         }
+
         public SCORMCourse getSCORMCourse(int SCORM_Course_id)
         {
             SCORMCourse scormCourse = new SCORMCourse();
@@ -584,7 +629,7 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 using (var context = ConnectionHelper.getContext())
                 {
-                    var j = context.SCORM_Course.Select(i => new { i.id, i.pathToIndex, i.pathToFolder, i.title_from_manifest, i.DateUploaded }).Where(ix => ix.id == SCORM_Course_id).FirstOrDefault();
+                    var j = context.SCORM_Course.Select(i => new {i.id, i.pathToIndex, i.pathToFolder, i.title_from_manifest, i.DateUploaded}).Where(ix => ix.id == SCORM_Course_id).FirstOrDefault();
                     if (j != null)
                     {
                         scormCourse.DateUploaded = j.DateUploaded.ToLongDateString();
@@ -599,8 +644,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return scormCourse;
         }
+
         public int GetCoreTrackingID(int iSCORM_Course_ID, string UserId)
         {
             int iCoreID = 0;
@@ -608,7 +655,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 using (var context = ConnectionHelper.getContext())
                 {
-                    var cmi_core = context.cmi_core.FromSql($"dbo.Sel_CoreTrackingID {iSCORM_Course_ID},{UserId} ").FirstOrDefault();
+                    var cmi_core = context.cmi_core.FromSqlRaw("EXECUTE dbo.Sel_CoreTrackingID @iSCORM_Course_ID,@UserId",
+                        new SqlParameter("iSCORM_Course_ID", iSCORM_Course_ID),
+                        new SqlParameter("UserId", UserId)
+                    ).ToList().FirstOrDefault();
                     iCoreID = cmi_core.core_id;
                 }
             }
@@ -616,8 +666,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return iCoreID;
         }
+
         public int GetSessionID(int iSCORM_Course_ID, string UserId, string sessionid, int iCore_id, DateTime dtStartTime)
         {
             int iSessionID = 0;
@@ -625,7 +677,13 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 using (var context = ConnectionHelper.getContext())
                 {
-                    var session = context.session.FromSql($"dbo.Sel_SessionID {iSCORM_Course_ID},  null, {UserId}, {sessionid}, {iCore_id}, {dtStartTime}").FirstOrDefault();
+                    var session = context.session.FromSqlRaw("EXECUTE dbo.Sel_SessionID @iSCORM_Course_ID , null, @UserId, @sessionid, @iCore_id, @dtStartTime",
+                        new SqlParameter("iSCORM_Course_ID", iSCORM_Course_ID),
+                        new SqlParameter("UserId", UserId),
+                        new SqlParameter("sessionid", sessionid),
+                        new SqlParameter("iCore_id", iCore_id),
+                        new SqlParameter("dtStartTime", dtStartTime)
+                    ).ToList().FirstOrDefault();
                     iSessionID = session.id;
                 }
             }
@@ -633,6 +691,7 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return iSessionID;
         }
 
@@ -643,7 +702,7 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 using (var context = ConnectionHelper.getContext())
                 {
-                    var cmi_interactions = context.cmi_interactions.FromSql($"select id from dbo.cmi_interactions where core_id = {cmi_core_id} AND n = {n}").FirstOrDefault();
+                    var cmi_interactions = context.cmi_interactions.FromSqlRaw($"select id from dbo.cmi_interactions where core_id = {cmi_core_id} AND n = {n}").FirstOrDefault();
                     id = cmi_interactions.id;
                 }
             }
@@ -651,12 +710,14 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             if (id > 0)
             {
                 // already exists
                 return id;
             }
-            else if (bNew)
+
+            if (bNew)
             {
                 try
                 {
@@ -666,16 +727,16 @@ namespace OpenSourceSCORMLMS.Helpers
                         // first, get highest "n"
                         DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                         cmd.CommandText = "select COALESCE(max(n)+1,0) as n from dbo.cmi_interactions where core_id=@cmi_core_id";
-                        cmd.Parameters.Add(new SqlParameter("@cmi_core_id", SqlDbType.Int) { Value = cmi_core_id });
-                        int max_n = (int)cmd.ExecuteScalar();
+                        cmd.Parameters.Add(new SqlParameter("@cmi_core_id", SqlDbType.Int) {Value = cmi_core_id});
+                        int max_n = (int) cmd.ExecuteScalar();
                         if (max_n == n)
                         {
                             DbCommand cmd1 = context.Database.GetDbConnection().CreateCommand();
                             cmd1.CommandText = "INSERT dbo.cmi_interactions(n, core_id) output INSERTED.ID VALUES(@n, @cmi_core_id)";
                             // they supplied the correct value
-                            cmd1.Parameters.Add(new SqlParameter("@cmi_core_id", SqlDbType.Int) { Value = cmi_core_id });
-                            cmd1.Parameters.Add(new SqlParameter("@n", SqlDbType.Int) { Value = n });
-                            id = (int)cmd.ExecuteNonQuery();
+                            cmd1.Parameters.Add(new SqlParameter("@cmi_core_id", SqlDbType.Int) {Value = cmi_core_id});
+                            cmd1.Parameters.Add(new SqlParameter("@n", SqlDbType.Int) {Value = n});
+                            id = (int) cmd.ExecuteNonQuery();
                             return id;
                         }
                         else
@@ -690,8 +751,10 @@ namespace OpenSourceSCORMLMS.Helpers
                     logger.LogError(ex.Message);
                 }
             }
+
             return 0;
         }
+
         // Helper function for LMSGetvalue
         // Returns value for all student_preferences requests
         // the LMSInfo object is used to pass all data
@@ -704,9 +767,11 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.returnValue = "audio,language,speed,text";
                 return;
             }
+
             SqlCommand sqlCommand = new SqlCommand();
-            sqlCommand.CommandText = "SELECT user_id, coalesce(CONVERT(varchar(10),audio),'') audio, COALESCE(language,'') language, coalesce(CONVERT(varchar(10),speed),'') speed,  coalesce(CONVERT(varchar(10),[text]),'') [text] FROM cmi_student_preference WHERE user_id=@user_id";
-            sqlCommand.Parameters.Add(new SqlParameter("@user_id", SqlDbType.VarChar) { Value = user_id });
+            sqlCommand.CommandText =
+                "SELECT user_id, coalesce(CONVERT(varchar(10),audio),'') audio, COALESCE(language,'') language, coalesce(CONVERT(varchar(10),speed),'') speed,  coalesce(CONVERT(varchar(10),[text]),'') [text] FROM cmi_student_preference WHERE user_id=@user_id";
+            sqlCommand.Parameters.Add(new SqlParameter("@user_id", SqlDbType.VarChar) {Value = user_id});
             DataTable dt = GetDataTableCommand(sqlCommand);
             if (dt.Rows.Count > 0)
             {
@@ -738,6 +803,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.errorCode = "402";
             }
         }
+
         // Helper function for LMSGetvalue
         // Returns value for all learner_preferences requests
         // the LMSInfo object is used to pass all data
@@ -750,9 +816,11 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.returnValue = "audio_level,language,delivery_speed,audio_captioning";
                 return;
             }
+
             SqlCommand sqlCommand = new SqlCommand();
-            sqlCommand.CommandText = "SELECT user_id, coalesce(CONVERT(varchar(10),audio),'') audio_lvel, COALESCE(language,'') language, coalesce(CONVERT(varchar(10),speed),'') delivery_speed, coalesce(audio_captioning,'') audio_captioning  FROM cmi_student_preference WHERE user_id=@user_id";
-            sqlCommand.Parameters.Add(new SqlParameter("@user_id", SqlDbType.VarChar) { Value = user_id });
+            sqlCommand.CommandText =
+                "SELECT user_id, coalesce(CONVERT(varchar(10),audio),'') audio_lvel, COALESCE(language,'') language, coalesce(CONVERT(varchar(10),speed),'') delivery_speed, coalesce(audio_captioning,'') audio_captioning  FROM cmi_student_preference WHERE user_id=@user_id";
+            sqlCommand.Parameters.Add(new SqlParameter("@user_id", SqlDbType.VarChar) {Value = user_id});
             DataTable dt = GetDataTableCommand(sqlCommand);
             if (dt.Rows.Count > 0)
             {
@@ -798,12 +866,14 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.returnValue = "id,score,status";
                 return;
             }
+
             if (DataItem == "cmi.objectives._count")
             {
                 int i = getCountObjectivesByCoreID(core_id);
                 o.returnValue = i.ToString();
                 return;
             }
+
             string delimStr = ".";
             char[] delimiter = delimStr.ToCharArray();
             string[] sDataItem = DataItem.Split(delimiter, 6);
@@ -819,9 +889,10 @@ namespace OpenSourceSCORMLMS.Helpers
             if (int.TryParse(sIndex, out n))
             {
                 SqlCommand sqlCommand = new SqlCommand();
-                sqlCommand.CommandText = "SELECT COALESCE(n_id,'') n_id, COALESCE(CONVERT(varchar(20), score_raw), '') score_raw, COALESCE(CONVERT(varchar(20), score_min), '') score_min, COALESCE(CONVERT(varchar(20), score_max), '') score_max, status FROM cmi_objectives where n = @n and core_id = @core_id";
-                sqlCommand.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) { Value = core_id });
-                sqlCommand.Parameters.Add(new SqlParameter("@n", SqlDbType.Int) { Value = n });
+                sqlCommand.CommandText =
+                    "SELECT COALESCE(n_id,'') n_id, COALESCE(CONVERT(varchar(20), score_raw), '') score_raw, COALESCE(CONVERT(varchar(20), score_min), '') score_min, COALESCE(CONVERT(varchar(20), score_max), '') score_max, status FROM cmi_objectives where n = @n and core_id = @core_id";
+                sqlCommand.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) {Value = core_id});
+                sqlCommand.Parameters.Add(new SqlParameter("@n", SqlDbType.Int) {Value = n});
                 DataTable dt = GetDataTableCommand(sqlCommand);
                 if (dt.Rows.Count > 0)
                 {
@@ -850,6 +921,7 @@ namespace OpenSourceSCORMLMS.Helpers
                             {
                                 o.returnValue = dt.Rows[0]["score_min"].ToString();
                             }
+
                             break;
                         default:
                             break;
@@ -861,8 +933,8 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.errorString = "Bad value for n";
                 o.errorCode = "402";
             }
-
         }
+
         public void LMSGetValueObjectives2004(int core_id, LMSInfo o)
         {
             // get objectives values for SCORM 2004
@@ -875,12 +947,14 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.returnValue = "id,score,success_status,completion_status,progress_measure,description";
                 return;
             }
+
             if (DataItem == "cmi.objectives._count")
             {
                 int i = getCountObjectivesByCoreID(core_id);
                 o.returnValue = i.ToString();
                 return;
             }
+
             string delimStr = ".";
             char[] delimiter = delimStr.ToCharArray();
             string[] sDataItem = DataItem.Split(delimiter, 6);
@@ -896,9 +970,10 @@ namespace OpenSourceSCORMLMS.Helpers
             if (ConvertToInt(sIndex, out n))
             {
                 SqlCommand sqlCommand = new SqlCommand();
-                sqlCommand.CommandText = "SELECT COALESCE(n_id,'') n_id, COALESCE(CONVERT(varchar(20),score_raw),'') score_raw, COALESCE(CONVERT(varchar(20),score_min),'') score_min, COALESCE(CONVERT(varchar(20),score_max),'') score_max, COALESCE(CONVERT(varchar(20),score_scaled),'') score_scaled,COALESCE(success_status,'') success_status, COALESCE(completion_status,'') completion_status, COALESCE(progress_measure,0) progress_measure, COALESCE(description,'') description FROM cmi_objectives where n = @n and core_id = @core_id";
-                sqlCommand.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) { Value = core_id });
-                sqlCommand.Parameters.Add(new SqlParameter("@n", SqlDbType.Int) { Value = n });
+                sqlCommand.CommandText =
+                    "SELECT COALESCE(n_id,'') n_id, COALESCE(CONVERT(varchar(20),score_raw),'') score_raw, COALESCE(CONVERT(varchar(20),score_min),'') score_min, COALESCE(CONVERT(varchar(20),score_max),'') score_max, COALESCE(CONVERT(varchar(20),score_scaled),'') score_scaled,COALESCE(success_status,'') success_status, COALESCE(completion_status,'') completion_status, COALESCE(progress_measure,0) progress_measure, COALESCE(description,'') description FROM cmi_objectives where n = @n and core_id = @core_id";
+                sqlCommand.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) {Value = core_id});
+                sqlCommand.Parameters.Add(new SqlParameter("@n", SqlDbType.Int) {Value = n});
                 DataTable dt = GetDataTableCommand(sqlCommand);
                 if (dt.Rows.Count > 0)
                 {
@@ -940,6 +1015,7 @@ namespace OpenSourceSCORMLMS.Helpers
                             {
                                 o.returnValue = dt.Rows[0]["score_scaled"].ToString();
                             }
+
                             break;
                         default:
                             break;
@@ -951,8 +1027,8 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.errorString = "Bad value for n";
                 o.errorCode = "402";
             }
-
         }
+
         public void LMSGetValueCommentsFromLearner(int core_id, LMSInfo o)
         {
             // get Comments from Learner values for SCORM 2004
@@ -965,12 +1041,14 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.returnValue = "comment,location,timestamp";
                 return;
             }
+
             if (DataItem == "cmi.comments_from_learner._count")
             {
                 int i = getCountCommentsFromLearnerByCoreID(core_id);
                 o.returnValue = i.ToString();
                 return;
             }
+
             // if there is an "n" value extract the row corresponding to it
             string delimStr = ".";
             char[] delimiter = delimStr.ToCharArray();
@@ -983,7 +1061,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 int cmi_CommentsFromLearner_id = GetCommentsFromLearnerID(core_id, n, false);
                 SqlCommand sqlCommand = new SqlCommand();
                 sqlCommand.CommandText = "select comment,location,[timestamp] from cmi_comments_from_learner where id = @cmi_CommentsFromLearner_id";
-                sqlCommand.Parameters.Add(new SqlParameter("@cmi_CommentsFromLearner_id", SqlDbType.Int) { Value = cmi_CommentsFromLearner_id });
+                sqlCommand.Parameters.Add(new SqlParameter("@cmi_CommentsFromLearner_id", SqlDbType.Int) {Value = cmi_CommentsFromLearner_id});
                 DataTable dt = GetDataTableCommand(sqlCommand);
                 if (dt.Rows.Count > 0)
                 {
@@ -1009,9 +1087,8 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.errorString = "General Get Failure";
                 o.errorCode = "301";
             }
-
-
         }
+
         public void LMSGetValueCommentsFromLMS(int core_id, LMSInfo o)
         {
             // get Comments From LMS values for SCORM 2004
@@ -1027,11 +1104,13 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.returnValue = "comment,location,timestamp";
                 return;
             }
+
             if (DataItem == "cmi.comments_from_lms._count")
             {
                 int i = getCountCommentsFromLMS(SCORM_Course_id, SCO_identifier);
                 return;
             }
+
             // if there is an "n" value extract the row corresponding to it
             string delimStr = ".";
             char[] delimiter = delimStr.ToCharArray();
@@ -1044,7 +1123,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 int cmi_CommentsFromLMS_id = GetCommentsFromLMSID(SCORM_Course_id, SCO_identifier, n, false);
                 SqlCommand sqlCommand = new SqlCommand();
                 sqlCommand.CommandText = "select comment,location,[timestamp] from cmi_comments_from_lms where id=@cmi_CommentsFromLMS_id";
-                sqlCommand.Parameters.Add(new SqlParameter("@cmi_CommentsFromLMS_id", SqlDbType.Int) { Value = cmi_CommentsFromLMS_id });
+                sqlCommand.Parameters.Add(new SqlParameter("@cmi_CommentsFromLMS_id", SqlDbType.Int) {Value = cmi_CommentsFromLMS_id});
                 DataTable dt = GetDataTableCommand(sqlCommand);
 
 
@@ -1073,6 +1152,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 o.errorCode = "301";
             }
         }
+
         // This function inserts a new comment_from_learner row "n" if needed, or returns the id of the existing row
         // validation: make sure the "n" they supply, if new, is 1 more than previous
         // argument "bNew" - if false, don't return a new id. If there are no id's, return 0.
@@ -1088,6 +1168,7 @@ namespace OpenSourceSCORMLMS.Helpers
                     {
                         id = iy.id;
                     }
+
                     if (id > 0)
                     {
                         // already exists
@@ -1098,8 +1179,8 @@ namespace OpenSourceSCORMLMS.Helpers
                         // doesn't exist, have to insert it
                         DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                         cmd.CommandText = "select COALESCE(max(n)+1,0) as n from dbo.cmi_comment_from_learner where core_id=@core_id";
-                        cmd.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) { Value = core_id });
-                        int max_n = (int)cmd.ExecuteScalar();// first, get highest "n"
+                        cmd.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) {Value = core_id});
+                        int max_n = (int) cmd.ExecuteScalar(); // first, get highest "n"
                         if (max_n == n)
                         {
                             // they supplied the correct value
@@ -1128,8 +1209,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return id;
         }
+
         public string GetCommentsFromCMIData(int data_id)
         {
             string comment = "";
@@ -1148,8 +1231,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return comment;
         }
+
         public void SetValueComments(int data_id, string comment)
         {
             try
@@ -1168,8 +1253,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return;
         }
+
         public void SetValueCommentsFromLearner(int comment_id, string sDataItem, string comment)
         {
             string s = $"UPDATE dbo.cmi_comment_from_learner set {sDataItem} = @comment where id = @comment_id";
@@ -1179,8 +1266,8 @@ namespace OpenSourceSCORMLMS.Helpers
                 {
                     DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                     cmd.CommandText = s;
-                    cmd.Parameters.Add(new SqlParameter("@comment_id", SqlDbType.Int) { Value = comment_id });
-                    cmd.Parameters.Add(new SqlParameter("@comment", SqlDbType.VarChar) { Value = comment });
+                    cmd.Parameters.Add(new SqlParameter("@comment_id", SqlDbType.Int) {Value = comment_id});
+                    cmd.Parameters.Add(new SqlParameter("@comment", SqlDbType.VarChar) {Value = comment});
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -1188,8 +1275,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return;
         }
+
         public void SetValueInteractions(int interactions_id, string sDataItem, string sDataValue)
         {
             string s = $"UPDATE dbo.cmi_interactions set {sDataItem} = @sDataValue where id = @interactions_id";
@@ -1199,8 +1288,8 @@ namespace OpenSourceSCORMLMS.Helpers
                 {
                     DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                     cmd.CommandText = s;
-                    cmd.Parameters.Add(new SqlParameter("@interactions_id", SqlDbType.Int) { Value = interactions_id });
-                    cmd.Parameters.Add(new SqlParameter("@sDataValue", SqlDbType.VarChar) { Value = sDataValue });
+                    cmd.Parameters.Add(new SqlParameter("@interactions_id", SqlDbType.Int) {Value = interactions_id});
+                    cmd.Parameters.Add(new SqlParameter("@sDataValue", SqlDbType.VarChar) {Value = sDataValue});
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -1208,8 +1297,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return;
         }
+
         // find out if the user has a student_preferences record. If not, insert one
         public int GetStudentPreferenceID(int user_id)
         {
@@ -1223,6 +1314,7 @@ namespace OpenSourceSCORMLMS.Helpers
                     {
                         id = iy.id;
                     }
+
                     if (id > 0)
                     {
                         // already exists
@@ -1244,8 +1336,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return id;
         }
+
         // This function inserts a new comment_from_lms row "n" if needed, or returns the id of the existing row
         // validation: make sure the "n" they supply, if new, is 1 more than previous
         // argument "bNew" - if false, don't return a new id. If there are no id's, return 0.
@@ -1261,6 +1355,7 @@ namespace OpenSourceSCORMLMS.Helpers
                     {
                         id = iy.id;
                     }
+
                     if (id > 0)
                     {
                         // already exists
@@ -1272,9 +1367,9 @@ namespace OpenSourceSCORMLMS.Helpers
                         // first, get highest "n"
                         DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                         cmd.CommandText = "select COALESCE(max(n) + 1, 0) as n from dbo.cmi_comment_from_lms where SCORM_Course_id =@SCORM_Course_id and SCO_identifier=@SCO_id";
-                        cmd.Parameters.Add(new SqlParameter("@SCORM_Course_id", SqlDbType.Int) { Value = SCORM_Course_id });
-                        cmd.Parameters.Add(new SqlParameter("@SCO_id", SqlDbType.VarChar) { Value = SCO_identifier });
-                        int max_n = (int)cmd.ExecuteScalar();// first, get highest "n"
+                        cmd.Parameters.Add(new SqlParameter("@SCORM_Course_id", SqlDbType.Int) {Value = SCORM_Course_id});
+                        cmd.Parameters.Add(new SqlParameter("@SCO_id", SqlDbType.VarChar) {Value = SCO_identifier});
+                        int max_n = (int) cmd.ExecuteScalar(); // first, get highest "n"
                         if (max_n == n)
                         {
                             // they supplied the correct value
@@ -1303,8 +1398,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return id;
         }
+
         // find out if the user has a cmi_objectives record. If not, insert one
         // if we are inserting one, but the number is out of sequence, return -1
         public int GetObjectiveID(int core_id, int n)
@@ -1319,6 +1416,7 @@ namespace OpenSourceSCORMLMS.Helpers
                     {
                         id = iy.id;
                     }
+
                     if (id > 0)
                     {
                         // already exists
@@ -1330,17 +1428,18 @@ namespace OpenSourceSCORMLMS.Helpers
                         // first see what the next sequence number should be
                         DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                         cmd.CommandText = "SELECT coalesce(max(n),-1) from dbo.cmi_objectives where core_id = @core_id";
-                        cmd.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) { Value = core_id });
-                        int next_n = (int)cmd.ExecuteScalar();// first, get highest "n"
+                        cmd.Parameters.Add(new SqlParameter("@core_id", SqlDbType.Int) {Value = core_id});
+                        int next_n = (int) cmd.ExecuteScalar(); // first, get highest "n"
 
                         if (next_n == -1)
                         {
-                            next_n = 0;  // a return of -1 means there is no cmi_objective yet
+                            next_n = 0; // a return of -1 means there is no cmi_objective yet
                         }
                         else
                         {
                             next_n += 1; //increment existing one
                         }
+
                         // compare next_n to the "n" that they sent
                         if (next_n == n)
                         {
@@ -1365,6 +1464,7 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return id;
         }
 
@@ -1386,6 +1486,7 @@ namespace OpenSourceSCORMLMS.Helpers
                     {
                         id = iy.id;
                     }
+
                     if (id > 0)
                     {
                         // already exists
@@ -1397,8 +1498,8 @@ namespace OpenSourceSCORMLMS.Helpers
                         // first, get highest "n"
                         DbCommand cmd = context.Database.GetDbConnection().CreateCommand();
                         cmd.CommandText = "select COALESCE(max(n)+1,0) as n from dbo.cmi_interactions_correct_responses where interactions_id=@interactions_id";
-                        cmd.Parameters.Add(new SqlParameter("@interactions_id", SqlDbType.Int) { Value = interactions_id });
-                        int max_n = (int)cmd.ExecuteScalar();// first, get highest "n"
+                        cmd.Parameters.Add(new SqlParameter("@interactions_id", SqlDbType.Int) {Value = interactions_id});
+                        int max_n = (int) cmd.ExecuteScalar(); // first, get highest "n"
                         if (max_n == n)
                         {
                             // they supplied the correct value
@@ -1426,8 +1527,10 @@ namespace OpenSourceSCORMLMS.Helpers
             {
                 logger.LogError(ex.Message);
             }
+
             return 0;
         }
+
         public void SetValueInteractionsCorrectResponses(int id, string sValue)
         {
             try
@@ -1444,6 +1547,7 @@ namespace OpenSourceSCORMLMS.Helpers
                 logger.LogError(ex.Message);
             }
         }
+
         public void SetValueInteractionsObjections(int interaction_n, int n, string objective_id, int interactions_id)
         {
             try
@@ -1490,6 +1594,7 @@ namespace OpenSourceSCORMLMS.Helpers
 
             return dt;
         }
+
         public bool ConvertToInt(string s, out int i)
         {
             double nn;
@@ -1506,6 +1611,3 @@ namespace OpenSourceSCORMLMS.Helpers
         }
     }
 }
-
-
-

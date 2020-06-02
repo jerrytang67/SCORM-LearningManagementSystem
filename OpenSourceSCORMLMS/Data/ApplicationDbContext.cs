@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace OpenSourceSCORMLMS.Data
@@ -8,9 +9,8 @@ namespace OpenSourceSCORMLMS.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-             
         }
-       
+
         public DbSet<ModelSCORM.cmi_core> cmi_core { get; set; }
         public DbSet<ModelSCORM.cmi_data> cmi_data { get; set; }
         public DbSet<ModelSCORM.cmi_comment_from_learner> cmi_comment_from_learner { get; set; }
@@ -24,5 +24,4 @@ namespace OpenSourceSCORMLMS.Data
         public DbSet<ModelSCORM.session> session { get; set; }
         public DbSet<ModelSCORM.User_Module> User_Module { get; set; }
     }
-   
 }

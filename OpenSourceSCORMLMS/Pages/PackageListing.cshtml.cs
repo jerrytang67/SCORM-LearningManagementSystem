@@ -14,10 +14,11 @@ namespace OpenSourceSCORMLMS.Pages
         public List<SCORM_Course_fromSP> listPackagesWithUser { get; set; }
         private readonly UserManager<IdentityUser> _userManager;
         private IConfiguration _configuration;
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private ILogger _logger { get; set; }
         private Helpers.DatabaseHelper databaseHelper { get; set; }
-        public PackageListingModel(UserManager<IdentityUser> User, IConfiguration Configuration, IHostingEnvironment hostingEnvironment, ILogger<UploadFileModel> logger)
+
+        public PackageListingModel(UserManager<IdentityUser> User, IConfiguration Configuration, IWebHostEnvironment hostingEnvironment, ILogger<UploadFileModel> logger)
         {
             _userManager = User;
             _configuration = Configuration;
@@ -25,14 +26,16 @@ namespace OpenSourceSCORMLMS.Pages
             _logger = logger;
             databaseHelper = new Helpers.DatabaseHelper(_logger);
         }
-       [Authorize]
+
+        // [Authorize]
         public void OnGet()
         {
             if (!Models.SignedInUser.isSignedIn)
             {
                 Response.Redirect("/Identity/Account/Login?returnUrl=" + Request.Path);
             }
-            string UserID = _userManager.GetUserId(HttpContext.User);
+
+            var UserID = _userManager.GetUserId(HttpContext.User);
             listPackagesWithUser = databaseHelper.getCourseListWithUserIndicator(UserID);
         }
     }

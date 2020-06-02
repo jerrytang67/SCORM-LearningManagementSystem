@@ -12,16 +12,22 @@ namespace OpenSourceSCORMLMS.Pages
 {
     public class SCORMPlayerModel : PageModel
     {
-        public int SCORM_Course_id { get; set;}
+        public int SCORM_Course_id { get; set; }
         public string UserID { get; set; }
         public string sLaunchParameters { get; set; } // this is javascript to tell the SCORM scripts what course to launch etc.
         public string sIframeSrc { get; set; }
         private readonly UserManager<IdentityUser> _userManager;
         private IConfiguration _configuration;
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private ILogger _logger { get; set; }
         private Helpers.DatabaseHelper databaseHelper { get; set; }
-        public SCORMPlayerModel(UserManager<IdentityUser> User, IConfiguration Configuration, IHostingEnvironment hostingEnvironment, ILogger<UploadFileModel> logger)
+
+        public SCORMPlayerModel(
+            UserManager<IdentityUser> User,
+            IConfiguration Configuration,
+            IWebHostEnvironment hostingEnvironment,
+            ILogger<UploadFileModel> logger
+        )
         {
             _userManager = User;
             _configuration = Configuration;
@@ -29,16 +35,18 @@ namespace OpenSourceSCORMLMS.Pages
             _logger = logger;
             databaseHelper = new Helpers.DatabaseHelper(_logger);
         }
-        [Authorize]
+
+        // [Authorize]
         public void OnGet()
         {
             if (!Models.SignedInUser.isSignedIn)
             {
                 Response.Redirect("/Identity/Account/Login?returnUrl=" + Request.Path);
             }
+
             string siteUrl = Request.Host.ToUriComponent();
             UserID = _userManager.GetUserId(HttpContext.User);
-            
+
             if (Request.Query["id"] != String.Empty && Helpers.UtilityFunctions.isInteger(Request.Query["id"]))
             {
                 SCORM_Course_id = Convert.ToInt32(Request.Query["id"]);
@@ -48,6 +56,7 @@ namespace OpenSourceSCORMLMS.Pages
                 sIframeSrc = scoLaunch.Url;
             }
         }
+
         private string SetupJavascript(SCORMLaunchParameters scoLaunch)
         {
             return $@"var SCOClient = SCOClient || {{}};
@@ -63,6 +72,7 @@ SCOClient.divDebugID = 'divDebug';
 SCOClient.bDebug = false;
 SCOClient.DateCreated = '{DateTime.Today}'; ";
         }
+
         private SCORMLaunchParameters GetCourseInformation(string user_id)
         {
             SCORMLaunchParameters scoLaunch = new SCORMLaunchParameters();
@@ -81,12 +91,11 @@ SCOClient.DateCreated = '{DateTime.Today}'; ";
             string AspNetSessionID = "ScormClientAPI";
             scoLaunch.SessionId = getSCOSessionID(iCore_id, SCORM_Course_id, UserID, AspNetSessionID, DateTime.Now).ToString();
             return scoLaunch;
-
         }
 
         private int getSCOSessionID(int iCore_id, int iSCORM_Course_id, string UserId, string aspnetSessionID, DateTime dtStartTime)
         {
-            int iSessionID = databaseHelper.GetSessionID(iSCORM_Course_id,  UserId, aspnetSessionID, iCore_id, dtStartTime);
+            int iSessionID = databaseHelper.GetSessionID(iSCORM_Course_id, UserId, aspnetSessionID, iCore_id, dtStartTime);
             return iSessionID;
         }
 
@@ -95,7 +104,5 @@ SCOClient.DateCreated = '{DateTime.Today}'; ";
             int iCore_id = databaseHelper.GetCoreTrackingID(iSCORM_Course_id, UserID);
             return iCore_id;
         }
-
-        
     }
 }

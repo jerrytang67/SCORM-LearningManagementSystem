@@ -18,11 +18,9 @@
 <div class="row">
     <div class="col-md-9">
         <div id="dropzone">
-            <form method="post"  enctype="multipart/form-data" class="dropzone needsclick dz-clickable" id="uploader">
+            <form method="post" enctype="multipart/form-data" class="dropzone needsclick dz-clickable" id="uploader">
                 <div class="dz-message needsclick dropDiv">
-                    Drop SCORM packages (in zip files) here or click to upload.
-                    <br>
-                    After uploading, your package will launch in a separate window.
+                    请把SCORM packages (Zip文件) 拖到此处.
                 </div>
             </form>
         </div>
@@ -33,7 +31,7 @@
     Dropzone.options.uploader = {
         paramName: "file",
         url: "/UploadFile",
-        maxFilesize: 20,
+        maxFilesize: 2000,
         acceptedFiles: ".zip",
         dictInvalidFileType: "Please upload only SCORM packages in .zip format",
         init: function () {
@@ -42,8 +40,8 @@
                 $(".dz-error-mark").css("display", "none");
                 // console.log(file);
 
-                //   alert(response.message);
-                window.location.href = response.url;
+                alert(response.message);
+//                window.location.href = response.url;
             });
             this.on("error", function (file) {
                 $(".dz-error-mark svg").css("background", "red");
@@ -53,6 +51,3 @@
 
     };
     $('#uploader').dropzone();</script>
-
-
-

@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Models;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Data;
-using System.Text;
 using OpenSourceSCORMLMS.Data.ModelSCORM;
 
 namespace OpenSourceSCORMLMS.Api
@@ -134,7 +131,6 @@ namespace OpenSourceSCORMLMS.Api
         {
             SCORM.Setvalue(o); // the SetValue object takes care of all Setvalue calls
             return Json(o);
-
         }
 
         // GET api/LMSCommit

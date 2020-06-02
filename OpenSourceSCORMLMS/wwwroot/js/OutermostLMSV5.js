@@ -1,17 +1,17 @@
 /*******************************************************************************
-**
-** FileName: OutermostLMSV5.js
-** Common LMS interface routines 
-*******************************************************************************/
+ **
+ ** FileName: OutermostLMSV5.js
+ ** Common LMS interface routines
+ *******************************************************************************/
 
 /*******************************************************************************
-**
-** By David Hodges
-** Outermost Software, LLC
-** Brattleboro, VT
+ **
+ ** By David Hodges
+ ** Outermost Software, LLC
+ ** Brattleboro, VT
  **  Rev 5/15/2018 Revised from OutermostLMSV3.js for ThinClient project, using new WebAPI interface
  ** Rev 6/11/2018 Adding error log for debugging, plus debug window
-*******************************************************************************/
+ *******************************************************************************/
 //debug info
 var blnDebug = true;
 var aryDebug = new Array();
@@ -31,10 +31,10 @@ var sco_identifier;
 var exit_status;
 
 /****************************************************************************************
-** api class. This api takes the SCORM-compliant calls from the SCO
-** and converts them to the OUTERMOST Web Service behavior calls that interact
-** with the OUTERMOST LMS.
-****************************************************************************************/
+ ** api class. This api takes the SCORM-compliant calls from the SCO
+ ** and converts them to the OUTERMOST Web Service behavior calls that interact
+ ** with the OUTERMOST LMS.
+ ****************************************************************************************/
 function apiclass() {
     this._Debug = true;  // set this to false to turn debugging off
 
@@ -90,21 +90,21 @@ function apiclass() {
         apiclass.prototype.GetDiagnostic = _LMSGetDiagnostic;
     }
 
-	/*******************************************************************************
-	**
-	** Function: LMSInitialize()
-	** Inputs:  None
-	** Return:  CMIBoolean true if the initialization was successful, or
-	**          CMIBoolean false if the initialization failed.
-	**
-	** Description:
-	** Initialize communication with LMS by calling the LMSInitialize
-	** Web Service
-	**
-	*******************************************************************************/
+    /*******************************************************************************
+     **
+     ** Function: LMSInitialize()
+     ** Inputs:  None
+     ** Return:  CMIBoolean true if the initialization was successful, or
+     **          CMIBoolean false if the initialization failed.
+     **
+     ** Description:
+     ** Initialize communication with LMS by calling the LMSInitialize
+     ** Web Service
+     **
+     *******************************************************************************/
 
     function _LMSInitialize(val) {
-
+        let _result = "false";
         WriteToDebug("----------------------------------------");
         WriteToDebug("----------------------------------------");
         WriteToDebug("In LMS Initialize");
@@ -113,11 +113,11 @@ function apiclass() {
         WriteToDebug("----------------------------------------");
         WriteToDebug("----------------------------------------");
 
-        if (val != '') {
+        if (val !== '') {
             this.LastErrorString = "Value passed to LMSInitialize, should be blank";
             this.LastError = "201";
             this.LastErrorDiagnostic = "Error from API";
-            return "false";
+            _result = "false";
         }
 
         if (this.initialized) {
@@ -125,7 +125,7 @@ function apiclass() {
             this.LastError = "101";
             this.LastErrorDiagnostic = "Error from API";
             WriteToDebug(this.LastErrorString);
-            return "false";
+            _result = "false";
         }
         // the calling application leaves a session id and other variables 
         this._sessionid = SCOClient.sessionid;
@@ -149,14 +149,9 @@ function apiclass() {
                 API.LastError = lmsInfo.errorCode;
                 API.LastErrorString = lmsInfo.errorString
                 // check error code from server
-                if (lmsInfo.errorCode != "0") {
-                    API.initialized = false;
-                }
-                else {
-                    API.initialized = true;
-                }
+                API.initialized = lmsInfo.errorCode === "0";
                 if (API._Debug) console.log("Initialized: " + API.initialized);
-                return (API.initialized) ? "true" : "false";
+                _result = (API.initialized) ? "true" : "false";
             },
             error: function (request, error) {
                 // Ajax call failed
@@ -165,22 +160,24 @@ function apiclass() {
                 API.LastErrorDiagnostic = "AJAX error";
                 WriteToDebug("Ajax error");
                 WriteToDebug(error.Message);
-                return "false";
+                _result = "false";
             }
         });
+        return _result;
     }
-	/*******************************************************************************
-	**
-	** Function LMSFinish()
-	** Inputs:  None
-	** Return:  CMIBoolean true if successful
-	**          CMIBoolean false if failed.
-	**
-	** Description:
-	** Close communication with LMS by calling the LMSFinish
-	** function which will be implemented by the LMS
-	**
-	*******************************************************************************/
+
+    /*******************************************************************************
+     **
+     ** Function LMSFinish()
+     ** Inputs:  None
+     ** Return:  CMIBoolean true if successful
+     **          CMIBoolean false if failed.
+     **
+     ** Description:
+     ** Close communication with LMS by calling the LMSFinish
+     ** function which will be implemented by the LMS
+     **
+     *******************************************************************************/
     function _LMSFinish(val) {
         WriteToDebug("LMSFinish");
         if (val != '') {
@@ -197,7 +194,7 @@ function apiclass() {
         }
         // LMSInfo object carries arguments to the server and back
         var lmsInfo = JSON.stringify(createLMSInfo(API._sessionid, API._userid, API._coreid, API._scorm_course_id, API._sco_identifier));
-        WriteToDebug("LMSFinish: " + JSON.stringify({ 'lmsInfo': lmsInfo }));
+        WriteToDebug("LMSFinish: " + JSON.stringify({'lmsInfo': lmsInfo}));
         $.ajax({
             type: "POST",
             url: "/api/LMSFinish",
@@ -228,30 +225,31 @@ function apiclass() {
         }
     }
 
-	/*******************************************************************************
-	**
-	** Function LMSGetValue(name)
-	** Inputs:  name - string representing the cmi data model defined category or
-	**             element (e.g. cmi.core.student_id)
-	** Return:  The value presently assigned by the LMS to the cmi data model
-	**       element defined by the element or category identified by the name
-	**       input value.
-	**
-	** Description:
-	** Wraps the call to the LMS LMSGetValue method
-	**
-	*******************************************************************************/
+    /*******************************************************************************
+     **
+     ** Function LMSGetValue(name)
+     ** Inputs:  name - string representing the cmi data model defined category or
+     **             element (e.g. cmi.core.student_id)
+     ** Return:  The value presently assigned by the LMS to the cmi data model
+     **       element defined by the element or category identified by the name
+     **       input value.
+     **
+     ** Description:
+     ** Wraps the call to the LMS LMSGetValue method
+     **
+     *******************************************************************************/
     function _LMSGetValue(name) {
+        let _result = "false";
         WriteToDebug("LMSGetValue");
         if (!API.initialized) {
             API.LastErrorString = "LMS is not initialized, call to LMSGetValue ignored.";
             API.LastError = "301";
             API.LastErrorDiagnostic = "Error from API";
             if (API._Debug) console.log("Not Initialized");
-            return "";
+            _result = "";
         }
         var lmsInfo = JSON.stringify(createLMSInfo(API._sessionid, API._userid, API._coreid, API._scorm_course_id, API._sco_identifier, name));
-        WriteToDebug("GETVALUE: " + JSON.stringify({ 'lmsInfo': lmsInfo }));
+        WriteToDebug("GETVALUE: " + JSON.stringify({'lmsInfo': lmsInfo}));
         $.ajax({
             type: "POST",
             url: "/api/LMSGetValue",
@@ -264,11 +262,10 @@ function apiclass() {
                 API.LastError = lmsInfo.errorCode;
                 API.LastErrorString = lmsInfo.errorString;
                 // check error code from server
-                if (lmsInfo.errorCode != "0") {
-                    return "false";
-                }
-                else {
-                    return lmsInfo.returnValue;
+                if (lmsInfo.errorCode !== "0") {
+                    _result = "false";
+                } else {
+                    _result = lmsInfo.returnValue;
                 }
             },
             error: function (request, error) {
@@ -278,36 +275,38 @@ function apiclass() {
                 API.LastErrorDiagnostic = "AJAX error";
                 WriteToDebug("Ajax error");
                 WriteToDebug(error.Message);
-                return "false";
-
+                _result = "false";
             }
         });
+        return _result;
     }
-	/*******************************************************************************
-	**
-	** Function LMSSetValue(name, value)
-	** Inputs:  name -string representing the data model defined category or element
-	**          value -the value that the named element or category will be assigned
-	** Return:  CMIBoolean true if successful
-	**          CMIBoolean false if failed.
-	**
-	** Description:
-	** Wraps the call to the LMS LMSSetValue function
-	**
-	*******************************************************************************/
+
+    /*******************************************************************************
+     **
+     ** Function LMSSetValue(name, value)
+     ** Inputs:  name -string representing the data model defined category or element
+     **          value -the value that the named element or category will be assigned
+     ** Return:  CMIBoolean true if successful
+     **          CMIBoolean false if failed.
+     **
+     ** Description:
+     ** Wraps the call to the LMS LMSSetValue function
+     **
+     *******************************************************************************/
     function _LMSSetValue(name, value) {
+        var _result = "false";
         if (API._Debug) console.log("LMSSetValue");
-        if (name == "cmi.core.lesson_status" || name == "cmi.core.exit") {
+        if (name === "cmi.core.lesson_status" || name === "cmi.core.exit") {
             API._exit_status = value; // set this so LMSFinish knows what to do
         }
         if (!API.initialized) {
             API.LastErrorString = "LMS is not initialized, call to LMSSetValue ignored.";
             API.LastError = "301";
             API.LastErrorDiagnostic = "Error from API";
-            return "false";
+            _result = "false";
         }
-        var lmsInfo = JSON.stringify(createLMSInfo(API._sessionid, API._userid, API._coreid, API._scorm_course_id, API._sco_identifier, name, value));
-        WriteToDebug("SETVALUE: " + JSON.stringify({ 'lmsInfo': lmsInfo }));
+        const lmsInfo = JSON.stringify(createLMSInfo(API._sessionid, API._userid, API._coreid, API._scorm_course_id, API._sco_identifier, name, value));
+        WriteToDebug("SETVALUE: " + JSON.stringify({'lmsInfo': lmsInfo}));
         $.ajax({
             type: "POST",
             url: "/api/LMSSetValue",
@@ -316,16 +315,7 @@ function apiclass() {
             contentType: "application/json; charset=utf-8",
             async: false,
             success: function (response) {
-                lmsInfo = response;
-                API.LastError = lmsInfo.errorCode;
-                API.LastErrorString = lmsInfo.errorString
-                // check error code from server
-                if (lmsInfo.errorCode != "0") {
-                    return "false";
-                }
-                else {
-                    return lmsInfo.ReturnValue;
-                }
+                _result = response.returnValue ?? "false";
             },
             error: function (request, error) {
                 // Ajax call failed
@@ -334,20 +324,22 @@ function apiclass() {
                 API.LastErrorDiagnostic = "AJAX error";
                 WriteToDebug("Ajax error");
                 WriteToDebug(error.Message);
-                return "false";
+                _result = "false";
             }
         });
+        return _result;
     }
-	/*******************************************************************************
-	**
-	** Function LMSCommit()
-	** Inputs:  None
-	** Return:  None
-	**
-	** Description:
-	** Call the LMSCommit function 
-	**
-	*******************************************************************************/
+
+    /*******************************************************************************
+     **
+     ** Function LMSCommit()
+     ** Inputs:  None
+     ** Return:  None
+     **
+     ** Description:
+     ** Call the LMSCommit function
+     **
+     *******************************************************************************/
     function _LMSCommit(val) {
         // LMSCommit is a no-op since we commit every time.
         if (API._Debug) console.log("LMSCommit");
@@ -365,57 +357,58 @@ function apiclass() {
         }
         return "true";
     }
-	/*******************************************************************************
-	**
-	** Function LMSGetLastError()
-	** Inputs:  None
-	** Return:  The error code that was set by the last LMS function call
-	**
-	** Description:
-	** Call the LMSGetLastError function 
-	**
-	*******************************************************************************/
+
+    /*******************************************************************************
+     **
+     ** Function LMSGetLastError()
+     ** Inputs:  None
+     ** Return:  The error code that was set by the last LMS function call
+     **
+     ** Description:
+     ** Call the LMSGetLastError function
+     **
+     *******************************************************************************/
     function _LMSGetLastError() {
         if (API._Debug) console.log("LMSgetLastError");
         return API.LastError;
     }
 
-	/*******************************************************************************
-	**
-	** Function LMSGetErrorString(errorCode)
-	** Inputs:  errorCode - Error Code
-	** Return:  The textual description that corresponds to the input error code
-	**
-	** Description:
-	** Call the LMSGetErrorString function 
-	**
-	********************************************************************************/
+    /*******************************************************************************
+     **
+     ** Function LMSGetErrorString(errorCode)
+     ** Inputs:  errorCode - Error Code
+     ** Return:  The textual description that corresponds to the input error code
+     **
+     ** Description:
+     ** Call the LMSGetErrorString function
+     **
+     ********************************************************************************/
     function _LMSGetErrorString() {
         if (API._Debug) console.log("LMSGetErrorString");
         return API.LastErrorString;
     }
 
-	/*******************************************************************************
-	**
-	** Function MSGetDiagnostic()
-	** Return:  The vendor specific textual description that corresponds to the 
-	**          input error code
-	**
-	** Description:
-	** Call the LMSGetDiagnostic function
-	**
-	*******************************************************************************/
+    /*******************************************************************************
+     **
+     ** Function MSGetDiagnostic()
+     ** Return:  The vendor specific textual description that corresponds to the
+     **          input error code
+     **
+     ** Description:
+     ** Call the LMSGetDiagnostic function
+     **
+     *******************************************************************************/
     function _LMSGetDiagnostic() {
         if (API._Debug) console.log("LMSGetDiagnostic");
         return API.LastErrorDiagnostic;
     }
 } // end API
 /*********************************************************************************
-**
-** Function createLMSInfo(...)
-** returns an LMSInfo object for data transfer to and from the server
- * 
-*********************************************************************************/
+ **
+ ** Function createLMSInfo(...)
+ ** returns an LMSInfo object for data transfer to and from the server
+ *
+ *********************************************************************************/
 function createLMSInfo(Sessionid, user_id, core_id, SCORM_course_id, SCO_identifier, DataItem, DataValue, ErrorCode, ErrorString, ErrorDiagnostic, ReturnValue) {
     var o = new Object();
     o.sessionId = Sessionid;
@@ -436,11 +429,12 @@ function createLMSInfo(Sessionid, user_id, core_id, SCORM_course_id, SCO_identif
     }
     return o;
 }
+
 /*********************************************************************************
-**
-** Debug functions
-**
-*********************************************************************************/
+ **
+ ** Debug functions
+ **
+ *********************************************************************************/
 function WriteToDebug(strInfo) {
 
     if (blnDebug) {
@@ -482,8 +476,7 @@ function ShowDebugWindow() {
 
     if (winDebug === null) {
         alert("Debug window could not be opened, popup blocker in place?");
-    }
-    else {
+    } else {
         if (winDebug.addEventListener || winDebug.attachEvent) {
             winDebug[winDebug.addEventListener ? 'addEventListener' : 'attachEvent'](
                 (winDebug.attachEvent ? 'on' : '') + 'load',

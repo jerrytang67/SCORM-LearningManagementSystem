@@ -264,3 +264,6 @@ paket-files/
 __pycache__/
 *.pyc
 /OpenSourceSCORMLMS/SCORM
+/OpenSourceSCORMLMS/wwwroot/SCORMCourses/
+/OpenSourceSCORMLMS/SCORMCourses/
+/OpenSourceSCORMLMS/SCORMPackages/

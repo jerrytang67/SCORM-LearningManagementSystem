@@ -18,10 +18,10 @@ namespace OpenSourceSCORMLMS.Pages
     {
         private readonly UserManager<IdentityUser> _userManager;
         private IConfiguration _configuration;
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private ILogger _logger { get; set; }
         private Helpers.DatabaseHelper databaseHelper { get; set; }
-        public UploadFileModel(UserManager<IdentityUser> User, IConfiguration Configuration, IHostingEnvironment hostingEnvironment, ILogger<UploadFileModel> logger)
+        public UploadFileModel(UserManager<IdentityUser> User, IConfiguration Configuration, IWebHostEnvironment hostingEnvironment, ILogger<UploadFileModel> logger)
         {
             _userManager = User;
             _configuration = Configuration;
@@ -29,20 +29,23 @@ namespace OpenSourceSCORMLMS.Pages
             _logger = logger;
             databaseHelper = new Helpers.DatabaseHelper(_logger);
         }
-        [Authorize]
+        // [Authorize]
         public void OnGet()
         {
-            
+
         }
-        [Authorize]
+
+        // [Authorize]
+        // [RequestSizeLimit(100_000_000)]
         public async Task<IActionResult> OnPostAsync(IFormFile file)
         {
             string UserID = _userManager.GetUserId(HttpContext.User);
             bool isSavedSuccessfully = true;
             _logger.LogInformation("Saving package...");
             var siteRoot = _environment.ContentRootPath;
+            var wwwroot = Path.Combine(siteRoot, "wwwroot");
             var uploadFolder = Path.Combine(siteRoot, Helpers.ConfigurationHelper.UploadFolder);
-            var courseFolder = Path.Combine(siteRoot, Helpers.ConfigurationHelper.CourseFolder);
+            var courseFolder = Path.Combine(wwwroot, Helpers.ConfigurationHelper.CourseFolder);
             if (!Directory.Exists(courseFolder))
             {
                 Directory.CreateDirectory(courseFolder);
@@ -56,7 +59,6 @@ namespace OpenSourceSCORMLMS.Pages
 
             if (file.Length > 0)
             {
-
                 string newFilename = Helpers.FileSystemHelper.getUniqueFileName(pathToFile);
                 if (!string.IsNullOrWhiteSpace(newFilename))
                 {
@@ -74,7 +76,7 @@ namespace OpenSourceSCORMLMS.Pages
             {
                 sFileNameWithoutExtension = sFileNameWithoutExtension.Replace(c.ToString(), string.Empty);
             }
-    
+
             // Unzip the package
             string sPathToPackageFolder = Path.Combine(courseFolder, sFileNameWithoutExtension);
             ZipFile.ExtractToDirectory(pathToFile, sPathToPackageFolder, true);
@@ -84,11 +86,11 @@ namespace OpenSourceSCORMLMS.Pages
             scorm.parseManifest(sPathToManifest);
             string sPathToIndex = scorm.href;
             databaseHelper.InsertScormCourse(scorm.title, scorm.title, sPathToIndex, sPathToManifest, sPathToPackageFolder, scorm.SCORM_Version, DateTime.Now, UserID);
-           
+
             if (isSavedSuccessfully)
             {
                 _logger.LogInformation("SCORM package saved.");
-                return new JsonResult(new { Message = fname, Url = sPathToIndex });
+                return new JsonResult(new { Message = "上传成功,到全部课程去管理课程", Url = sPathToIndex });
             }
             else
             {

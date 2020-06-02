@@ -4,23 +4,23 @@
     ViewData["Title"] = "MyCourses For Study";
 }
 
-<h2>My Courses For Study</h2>
+<h2>我的学习课程</h2>
 
 <table id="gridPackages" class="table table-striped">
     <thead>
-        <tr>
-            <th>Title</th>
-            <th>ModuleID</th>
-            <th>Date Added </th>
-            <th>Date Completed</th>
-            <th>Date Passed</th>
-            <th>Score</th>
-            <th>Launch</th>
-        </tr>
+    <tr>
+        <th>标题</th>
+        <th>ModuleID</th>
+        <th>加入时间</th>
+        <th>完成时间</th>
+        <th>学习时间</th>
+        <th>分数</th>
+        <th>运行</th>
+    </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.listModules)
-        {
+    @foreach (var item in Model.listModules)
+    {
         <tr>
             <td>@item.SCORM_Course.title_from_manifest
 
@@ -40,9 +40,9 @@
                 @item.dScore
             </td>
             <td>
-                <a href="SCORMPlayer?id=@item.SCORM_Course.id" target="_blank">Launch this Course</a>
+                <a href="SCORMPlayer?id=@item.SCORM_Course.id" target="_blank">开始学习</a>
             </td>
         </tr>
-        }
+    }
     </tbody>
 </table>

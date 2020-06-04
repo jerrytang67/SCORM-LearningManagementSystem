@@ -120,12 +120,12 @@ namespace OpenSourceSCORMLMS
 
             Helpers.ConfigurationHelper.Initialize(Configuration, httpContextAccessor);
             // we run SCORM courses out of its own folder (NOT wwwroot) so that HtmlHandler can check for authentication before returning any SCORM content
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(env.ContentRootPath, Helpers.ConfigurationHelper.CourseFolder)),
-                RequestPath = "/SCORM"
-            });
+            // app.UseStaticFiles(new StaticFileOptions
+            // {
+            //     FileProvider = new PhysicalFileProvider(
+            //         Path.Combine(env.ContentRootPath, Helpers.ConfigurationHelper.CourseFolder)),
+            //     RequestPath = "/SCORM"
+            // });
         }
     }
 }
